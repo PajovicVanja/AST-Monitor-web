@@ -47,35 +47,36 @@ temp_training_data = {"speeds": []}
 def latest_data():
     logging.debug("Received request for latest data")
 
-    # Read current HR
     basic_data.read_current_hr()
     current_hr = basic_data.current_heart_rate
     logging.debug(f"Current heart rate: {current_hr}")
 
-    # Read current GPS and calculate speed
     basic_data.read_current_gps()
     basic_data.calculate_speed()
     current_speed = basic_data.current_speed
-    logging.debug(f"Current speed: {current_speed}")
+    logging.debug(f"Current GPS: {basic_data.current_gps}, Previous GPS: {basic_data.previous_gps}")
+    logging.debug(f"Calculated current speed: {current_speed}")
 
-    # Calculate session time and distance
+    # Ensure current_speed is not null by falling back to last_valid_speed
+    if current_speed is None:
+        current_speed = basic_data.last_valid_speed
+        logging.debug(f"Using last valid speed: {current_speed}")
+
     session.calculate_time()
     time_s = convert_time_to_hours_minutes_seconds(int(session.time))
     session.add_distance(basic_data.distance)
     current_distance = round(session.distance / 1000, 2)
 
-    # Calculate ascent and altitude
     ascent = 0
     altitude = None
     if basic_data.current_gps:
         session.add_ascent(basic_data.current_gps[2])
         ascent = int(session.ascent)
         lat_lng = basic_data.current_gps[0:2]
-        altitude = basic_data.current_gps[2]  # Assuming altitude is the third value
+        altitude = basic_data.current_gps[2]
     else:
         lat_lng = None
 
-    # Goals processor updates
     progress = None
     remaining_ascent = None
     remaining_distance = None
@@ -86,6 +87,7 @@ def latest_data():
         remaining_distance = round(float(goals_processor.distance_to_go / 1000), 1)
 
     response = {
+        'cyclistID': 1,
         'heartrate': current_hr,
         'speed': round(current_speed, 1) if current_speed is not None else None,
         'distance': current_distance,
@@ -95,17 +97,16 @@ def latest_data():
         'altitude': altitude,
         'progress': progress,
         'remainingAscent': remaining_ascent,
-        'remainingDistance': remaining_distance,
-        'route': route  # Include the route in the response
+        'remainingDistance': remaining_distance
     }
 
-    # Append the current speed to the temp_training_data
     if current_speed is not None:
         temp_training_data["speeds"].append(current_speed)
         logging.debug(f"Appended speed: {current_speed} to temp_training_data")
 
     logging.debug("Response: %s", response)
     return jsonify(response)
+
 
 @sensor_bp.route('/api/route')
 def get_route():

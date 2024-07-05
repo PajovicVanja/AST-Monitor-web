@@ -295,3 +295,28 @@ def get_cyclist(cyclist_id):
         return jsonify({"message": "Cyclist not found or access denied"}), 404
 
     return jsonify(cyclist.to_dict()), 200
+
+
+
+@coach_bp.route('/currently_training', methods=['GET'])
+@jwt_required()
+def get_currently_training_cyclists():
+    """Get all cyclists that are currently in training.
+
+    Returns:
+        Response: JSON response with a list of cyclists currently in training.
+    """
+    try:
+        currently_training_cyclists = db.session.query(Cyclist).filter_by(is_training=True).all()
+        cyclists_data = [
+            {
+                'cyclistID': cyclist.cyclistID,
+                'name': cyclist.name,
+                'surname': cyclist.surname
+            }
+            for cyclist in currently_training_cyclists
+        ]
+        return jsonify(cyclists_data), 200
+    except Exception as e:
+        logging.error("Error fetching currently training cyclists: %s", str(e))
+        return jsonify({"error": "Error fetching currently training cyclists"}), 500

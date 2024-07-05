@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS public.cyclists
     profile_picture character varying(255) COLLATE pg_catalog."default",
     name character varying(50) COLLATE pg_catalog."default",
     surname character varying(50) COLLATE pg_catalog."default",
+    is_training boolean DEFAULT false,
     CONSTRAINT cyclists_pkey PRIMARY KEY ("cyclistID"),
     CONSTRAINT cyclists_email_unique UNIQUE (email),
     CONSTRAINT cyclists_username_key UNIQUE (username)

@@ -14,7 +14,7 @@ import numpy as np
 
 from ..models.training_plans_model import TrainingPlan, CyclistTrainingPlan
 from ..models.training_sessions_model import TrainingSession
-from ..models.usermodel import db
+from ..models.usermodel import db, Cyclist
 from ..utils import get_weather_data, compute_hill_data
 
 cyclist_bp = Blueprint('cyclist_bp', __name__)
@@ -442,22 +442,34 @@ def execute_training_plan(plan_id):
         return jsonify({"message": "Access denied"}), 403
 
     try:
+        logging.info(f'User {current_user_id} is executing training plan {plan_id}')
         training_plan = db.session.query(TrainingPlan).join(CyclistTrainingPlan).filter(
             CyclistTrainingPlan.cyclistID == current_user_id,
             TrainingPlan.plansID == plan_id
         ).first()
 
         if not training_plan:
+            logging.error(f'Training plan {plan_id} not found for user {current_user_id}')
             return jsonify({"error": "Training plan not found"}), 404
 
         training_plan.executed = 'Yes'
         db.session.commit()
+
+        # Verify that the executed attribute is updated
+        updated_training_plan = db.session.query(TrainingPlan).filter_by(plansID=plan_id).first()
+        if updated_training_plan.executed == 'Yes':
+            logging.info(f'Training plan {plan_id} executed successfully for user {current_user_id}')
+        else:
+            logging.error(f'Failed to update training plan {plan_id} for user {current_user_id}')
+            return jsonify({"error": "Failed to update training plan"}), 500
 
         return jsonify({"message": "Training plan executed successfully"}), 200
     except Exception as e:
         logging.error("Error executing training plan: %s", str(e))
         db.session.rollback()
         return jsonify({"error": f"Error executing training plan: {str(e)}"}), 500
+
+
 
 @cyclist_bp.route('/training_plans/<int:plan_id>', methods=['DELETE'])
 @jwt_required()
@@ -494,3 +506,90 @@ def delete_training_plan(plan_id):
         logging.error("Error deleting training plan: %s", str(e))
         db.session.rollback()
         return jsonify({"error": f"Error deleting training plan: {str(e)}"}), 500
+
+@cyclist_bp.route('/is_training', methods=['GET'])
+@jwt_required()
+def get_is_training():
+    """Check if the current cyclist is in training.
+
+    Returns:
+        Response: JSON response with training status.
+    """
+    identity = get_jwt_identity()
+    current_user_id = identity['user_id']
+
+    try:
+        cyclist = Cyclist.query.get(current_user_id)
+        current_training_plan_id = None
+        if cyclist.is_training:
+            # Assuming there is a way to determine the current training plan
+            current_training_plan = db.session.query(CyclistTrainingPlan).filter_by(cyclistID=current_user_id).first()
+            if current_training_plan:
+                current_training_plan_id = current_training_plan.plansID
+
+        return jsonify({"is_training": cyclist.is_training, "current_training_plan_id": current_training_plan_id})
+    except Exception as e:
+        logging.error("Error fetching training status: %s", str(e))
+        return jsonify({"error": "Error fetching training status"}), 500
+
+@cyclist_bp.route('/start_training/<int:plan_id>', methods=['POST'])
+@jwt_required()
+def start_training(plan_id):
+    """Start a training plan for the current cyclist.
+
+    Args:
+        plan_id (int): The ID of the training plan to start.
+
+    Returns:
+        Response: JSON response with success message or error message and status code.
+    """
+    identity = get_jwt_identity()
+    current_user_id = identity['user_id']
+
+    try:
+        cyclist = Cyclist.query.get(current_user_id)
+        if not cyclist:
+            return jsonify({"error": "Cyclist not found"}), 404
+
+        if cyclist.is_training:
+            return jsonify({"error": "Cyclist is already in training"}), 400
+
+        cyclist.is_training = True
+        # Update the current training plan to active
+        current_training_plan = CyclistTrainingPlan.query.filter_by(cyclistID=current_user_id, plansID=plan_id).first()
+        if current_training_plan:
+            db.session.commit()
+
+        return jsonify({"message": "Training started successfully"}), 200
+    except Exception as e:
+        logging.error("Error starting training: %s", str(e))
+        db.session.rollback()
+        return jsonify({"error": f"Error starting training: {str(e)}"}), 500
+
+
+
+
+@cyclist_bp.route('/end_training', methods=['POST'])
+@jwt_required()
+def end_training():
+    """End the current training session for the cyclist.
+
+    Returns:
+        Response: JSON response with success message or error message and status code.
+    """
+    identity = get_jwt_identity()
+    current_user_id = identity['user_id']
+
+    try:
+        cyclist = Cyclist.query.get(current_user_id)
+        if not cyclist:
+            return jsonify({"error": "Cyclist not found"}), 404
+
+        cyclist.is_training = False
+        db.session.commit()
+
+        return jsonify({"message": "Training ended successfully"}), 200
+    except Exception as e:
+        logging.error("Error ending training: %s", str(e))
+        db.session.rollback()
+        return jsonify({"error": f"Error ending training: {str(e)}"}), 500

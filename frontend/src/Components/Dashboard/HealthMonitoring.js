@@ -5,7 +5,6 @@ import '../../Styles/Dashboard.css';
 const HealthMonitoring = ({ token }) => {
   const [rules, setRules] = useState(null);
   const [error, setError] = useState('');
-  const [loadingPatterns, setLoadingPatterns] = useState(false);
   const [loadingSession, setLoadingSession] = useState(false);
   const [warnings, setWarnings] = useState([]);
   const [sessionData] = useState({
@@ -22,22 +21,6 @@ const HealthMonitoring = ({ token }) => {
     duration: 3600,
     total_distance: 50
   });
-
-  const handleRunNiaARM = async () => {
-    setLoadingPatterns(true);
-    setError('');
-    try {
-      const response = await axios.post('http://localhost:5000/cyclist/run_niaarm', {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setRules(response.data.rules);
-      console.log('Run Time:', response.data.run_time);
-    } catch (error) {
-      console.error('Error running NiaARM:', error.response ? error.response.data : error.message);
-      setError('Failed to run NiaARM: ' + (error.response ? error.response.data.error : error.message));
-    }
-    setLoadingPatterns(false);
-  };
 
   const handleCheckSession = async () => {
     setLoadingSession(true);
@@ -175,13 +158,6 @@ const HealthMonitoring = ({ token }) => {
     <div className="health-monitoring">
       <h2>Health Monitoring</h2>
       <div className="button-group">
-        <div className="button-section">
-          <p>Run the program to find health patterns from your previous training sessions using machine learning.</p>
-          <button onClick={handleRunNiaARM} disabled={loadingPatterns}>
-            {loadingPatterns ? 'Running NiaARM...' : 'Find Patterns'}
-          </button>
-        </div>
-        <hr className="button-divider" />
         <div className="button-section">
           <p>Check the last session for any health risks identified through data analysis.</p>
           <button onClick={handleCheckSession} disabled={loadingSession}>

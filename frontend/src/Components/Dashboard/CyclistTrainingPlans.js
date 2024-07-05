@@ -7,9 +7,27 @@ import thrashIcon from '../../Photos/thrashIcon.png';
 
 const CyclistTrainingPlans = ({ token }) => {
     const [trainingPlans, setTrainingPlans] = useState([]);
+    const [isTraining, setIsTraining] = useState(false);
+    const [currentTrainingPlanId, setCurrentTrainingPlanId] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
+        // Check if the cyclist is in training
+        axios.get('http://localhost:5000/cyclist/is_training', { headers: { Authorization: `Bearer ${token}` } })
+            .then(response => {
+                const { is_training, current_training_plan_id } = response.data;
+                setIsTraining(is_training);
+                setCurrentTrainingPlanId(current_training_plan_id);
+
+                if (is_training && current_training_plan_id) {
+                    navigate(`/dashboard/start-training/${current_training_plan_id}`);
+                }
+            })
+            .catch(error => {
+                console.error("There was an error fetching the training status!", error);
+            });
+
+        // Fetch the training plans
         axios.get('http://localhost:5000/cyclist/training_plans', { headers: { Authorization: `Bearer ${token}` } })
             .then(response => {
                 setTrainingPlans(response.data);
@@ -17,7 +35,7 @@ const CyclistTrainingPlans = ({ token }) => {
             .catch(error => {
                 console.error("There was an error fetching the training plans!", error);
             });
-    }, [token]);
+    }, [token, navigate]);
 
     const isToday = (date) => {
         const today = new Date();
@@ -26,7 +44,15 @@ const CyclistTrainingPlans = ({ token }) => {
     };
 
     const handleStartTraining = (planId) => {
-        navigate(`/dashboard/start-training/${planId}`);
+        axios.post(`http://localhost:5000/cyclist/start_training/${planId}`, {}, { headers: { Authorization: `Bearer ${token}` } })
+            .then(response => {
+                setIsTraining(true);
+                setCurrentTrainingPlanId(planId);
+                navigate(`/dashboard/start-training/${planId}`);
+            })
+            .catch(error => {
+                console.error("There was an error starting the training!", error);
+            });
     };
 
     const handleDeletePlan = (planId) => {
@@ -70,10 +96,10 @@ const CyclistTrainingPlans = ({ token }) => {
                         <button
                             className="start-training-button"
                             onClick={() => handleStartTraining(plan.plansID)}
-                            disabled={!isToday(plan.start_date)}
+                            disabled={!isToday(plan.start_date) || isTraining}
                             style={{
-                                backgroundColor: isToday(plan.start_date) ? '#4CAF50' : '#ccc',
-                                cursor: isToday(plan.start_date) ? 'pointer' : 'not-allowed'
+                                backgroundColor: isToday(plan.start_date) && !isTraining ? '#4CAF50' : '#ccc',
+                                cursor: isToday(plan.start_date) && !isTraining ? 'pointer' : 'not-allowed'
                             }}
                         >
                             Start Training

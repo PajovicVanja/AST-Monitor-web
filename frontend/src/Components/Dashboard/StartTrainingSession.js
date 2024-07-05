@@ -8,15 +8,18 @@ const StartTrainingSession = ({ token }) => {
     const { planId } = useParams();
     const navigate = useNavigate();
 
-    const handleEndWorkout = () => {
-        axios.post(`http://localhost:5000/cyclist/training_plans/${planId}/execute`, {}, { headers: { Authorization: `Bearer ${token}` } })
-            .then(response => {
-                alert('Workout completed successfully!');
-                navigate('/dashboard/calendar');
-            })
-            .catch(error => {
-                console.error("There was an error completing the workout!", error);
-            });
+    const handleEndWorkout = async () => {
+        try {
+            console.log('Ending workout for planId:', planId);
+            await axios.post(`http://localhost:5000/cyclist/training_plans/${planId}/execute`, {}, { headers: { Authorization: `Bearer ${token}` } });
+            console.log('Successfully executed training plan');
+            await axios.post('http://localhost:5000/cyclist/end_training', {}, { headers: { Authorization: `Bearer ${token}` } });
+            console.log('Successfully ended training');
+            alert('Workout completed successfully!');
+            navigate('/dashboard/calendar');
+        } catch (error) {
+            console.error("There was an error completing the workout!", error);
+        }
     };
 
     const saveTrainingData = async () => {

@@ -8,6 +8,7 @@ import CreateTrainingPlan from "./Coach/CreateTrainingPlan";
 import ImportPreview from "./Coach/ImportPreview";
 import CyclistTrainingPlans from "./CyclistTrainingPlans";
 import StartTrainingSession from "./StartTrainingSession";
+import CoachesView from "./Coach/CoachesView"; // Import the new CoachesView component
 import '../../Styles/Dashboard.css';
 
 const Dashboard = ({ role, token }) => {
@@ -23,6 +24,7 @@ const Dashboard = ({ role, token }) => {
                             <Route path="/athlete/:id/session/:sessionId" element={<HistoryCalendar token={token} role={role} />} />
                             <Route path="/create-plan" element={<CreateTrainingPlan token={token} />} />
                             <Route path="/import-preview" element={<ImportPreview token={token} />} />
+                            <Route path="/currently-training" element={<CoachesView token={token} />} /> {/* New route */}
                             <Route path="*" element={<Navigate to="/overview" />} />
                         </>
                     ) : (

@@ -67,9 +67,9 @@ const TrainingTemplate = ({ token, templates, setTemplates, handleTemplateSelect
                         <label className="form-label">
                             Type:
                             <select name="type" value={newTemplate.type} onChange={handleCreateTemplateChange} required className="form-input">
-                                <option value="endurance">Endurance</option>
-                                <option value="interval">Interval</option>
-                                <option value="recovery">Recovery</option>
+                                <option value="Endurance">Endurance</option>
+                                <option value="Interval">Interval</option>
+                                <option value="Recovery">Recovery</option>
                             </select>
                         </label>
                         <label className="form-label">

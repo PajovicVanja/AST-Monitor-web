@@ -62,7 +62,7 @@ const AthleteOverview = ({ token }) => {
         <div className="athlete-grid">
           {athletes.map(athlete => (
             <div key={athlete.cyclistID} onClick={() => navigate(`/dashboard/athlete/${athlete.cyclistID}`)} className="athlete-container">
-              <strong>{athlete.username}</strong>
+              <strong>{athlete.name && athlete.surname ? `${athlete.name} ${athlete.surname}` : athlete.username}</strong>
               {athlete.last_session ? (
                 <div>
                   <p>Last session date: {formatDate(athlete.last_session.time.split('T')[0])}</p>

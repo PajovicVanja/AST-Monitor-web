@@ -66,9 +66,9 @@ def insert_data(data_list, cyclist_id):
     session.close()
 
 # Usage Example
-data_file = 'Sport5Rider3.json'
+data_file = 'Sport5Rider4.json'
 data_list = load_json_data(data_file)
-insert_data(data_list, cyclist_id=1)
+insert_data(data_list, cyclist_id=4)
 
 # Commit the session to save your data to the database
 session.commit()
