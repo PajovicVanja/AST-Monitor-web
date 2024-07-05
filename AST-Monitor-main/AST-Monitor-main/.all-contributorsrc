@@ -1,0 +1,103 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "firefly-cpp",
+      "name": "Iztok Fister Jr.",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1633361?v=4",
+      "profile": "http://www.iztok-jr-fister.eu/",
+      "contributions": [
+        "bug",
+        "doc",
+        "code",
+        "maintenance",
+        "mentoring",
+        "platform"
+      ]
+    },
+    {
+      "login": "luckyLukac",
+      "name": "luckyLukac",
+      "avatar_url": "https://avatars.githubusercontent.com/u/73126820?v=4",
+      "profile": "https://github.com/luckyLukac",
+      "contributions": [
+        "bug",
+        "doc",
+        "code",
+        "design"
+      ]
+    },
+    {
+      "login": "carlosal1015",
+      "name": "Oromion",
+      "avatar_url": "https://avatars.githubusercontent.com/u/21283014?v=4",
+      "profile": "http://carlosal1015.github.io",
+      "contributions": [
+        "platform"
+      ]
+    },
+    {
+      "login": "alenrajsp",
+      "name": "alenrajsp",
+      "avatar_url": "https://avatars.githubusercontent.com/u/27721714?v=4",
+      "profile": "https://github.com/alenrajsp",
+      "contributions": [
+        "content",
+        "code",
+        "maintenance",
+        "bug"
+      ]
+    },
+    {
+      "login": "KukovecRok",
+      "name": "Tatookie",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33880044?v=4",
+      "profile": "https://github.com/KukovecRok",
+      "contributions": [
+        "doc",
+        "bug"
+      ]
+    },
+    {
+      "login": "rhododendrom",
+      "name": "rhododendrom",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3198785?v=4",
+      "profile": "https://github.com/rhododendrom",
+      "contributions": [
+        "design"
+      ]
+    },
+    {
+      "login": "sertonix",
+      "name": "Sertonix",
+      "avatar_url": "https://avatars.githubusercontent.com/u/83883937?v=4",
+      "profile": "https://github.com/sertonix",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "lahovniktadej",
+      "name": "Tadej Lahovnik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/57890734?v=4",
+      "profile": "https://github.com/lahovniktadej",
+      "contributions": [
+        "doc",
+        "code",
+        "bug"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true,
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "projectName": "AST-Monitor",
+  "projectOwner": "firefly-cpp",
+  "commitType": "docs"
+}

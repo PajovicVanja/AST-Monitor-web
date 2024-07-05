@@ -1,0 +1,6 @@
+PyQt6
+matplotlib
+geopy
+pyqt-feedback-flow
+tcxreader
+sport-activities-features
